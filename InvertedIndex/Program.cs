@@ -6,12 +6,13 @@
         {
             var invertedIndex = new SortedDictionary<string, List<StatisticalInformation>>();
 
-            Console.WriteLine("Введите директорию");
+            Console.WriteLine("Выберете директорию");
+
             var directory = Console.ReadLine();
 
             foreach (var file in Directory.GetFiles(directory))
             {
-                using (StreamReader reader = new StreamReader(file))
+                using (var reader = new StreamReader(file))
                 {
                     WriteInvertedIndex(invertedIndex, reader.ReadToEnd().Split(new char[] { ' ', '\n', '\t' }), file);
                 }
@@ -21,6 +22,9 @@
 
             var lexem = Console.ReadLine();
             var numberLine = 1;
+
+            invertedIndex[lexem].Sort();
+            invertedIndex[lexem].Reverse();
 
             foreach (var item in invertedIndex[lexem])
             {
@@ -46,7 +50,7 @@
                 {
                     var lexema = invertedIndex[text[i]].FirstOrDefault(e => e.FileName == fileName);
 
-                    if (lexema != null)
+                    if (lexema is not null)
                     {
 
                         if (lexema.PositionsEntry == null)
@@ -59,6 +63,10 @@
                             lexema.PositionsEntry.Add(i);
                             lexema.CountEntry++;
                         }
+                    }
+                    else
+                    {
+                        invertedIndex[text[i]].Add(new StatisticalInformation { FileName = fileName, CountEntry = 1, PositionsEntry = new List<int> { i } });
                     }
                 }
                 else
