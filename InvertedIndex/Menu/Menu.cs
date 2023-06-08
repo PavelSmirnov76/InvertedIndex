@@ -1,7 +1,5 @@
-﻿using InvertedIndex;
-using InvertedIndex.Services.ReaderService;
+﻿using InvertedIndex.Services.ReaderService;
 using SortingAlgorithmsConsoleView.Services.ReaderService;
-using System.Reflection.PortableExecutable;
 
 namespace SortingAlgorithmsConsoleView.Menu
 {
@@ -22,29 +20,28 @@ namespace SortingAlgorithmsConsoleView.Menu
             {
                 try
                 {
-                    var invertedIndex = new SortedDictionary<string, List<StatisticalInformation>>();
+                    var invertedIndex = new InvertedIndex.InvertedIndex();
 
                     menuWriterHelper.WriteChoiseDirectoryMenu();
 
                     var directory = readerService.Read();
 
                     foreach (var file in Directory.GetFiles(directory))
-                    {                     
-                        FillInvertedIndex(invertedIndex,
+                    {
+                        invertedIndex.FillInvertedIndex(
                                new FileReaderService(file).Read().Split(new char[] { ' ', '\n', '\t' }), file);
-
                     }
 
                     menuWriterHelper.WriteCoiseLexemeMenu();
 
                     var lexeme = readerService.Read();
 
-                    menuWriterHelper.WriteSortedLexemeEntries(lexeme, invertedIndex);
+                    menuWriterHelper.WriteSortedLexemeEntries(lexeme, invertedIndex.InvertedIndexDictionary);
 
                     menuWriterHelper.WriteChoisestring();
                     var line = int.Parse(readerService.Read()) - 1;
 
-                    menuWriterHelper.WriteSortedLexemeEntriesDetails(lexeme, line, invertedIndex);
+                    menuWriterHelper.WriteSortedLexemeEntriesDetails(lexeme, line, invertedIndex.InvertedIndexDictionary);
                 }
                 catch (Exception ex)
                 {
@@ -52,42 +49,6 @@ namespace SortingAlgorithmsConsoleView.Menu
                 }
             }
             while (true);
-        }
-
-        private static void FillInvertedIndex(SortedDictionary<string, List<StatisticalInformation>> invertedIndex, string[] text, string fileName)
-        {
-            for (int i = 0; i < text.Length; i++)
-            {
-                if (invertedIndex.ContainsKey(text[i]))
-                {
-                    var lexema = invertedIndex[text[i]].FirstOrDefault(e => e.FileName == fileName);
-
-                    if (lexema is not null)
-                    {
-
-                        if (lexema.PositionsEntry == null)
-                        {
-                            lexema.PositionsEntry = new List<int> { i };
-                            lexema.CountEntry++;
-                        }
-                        else
-                        {
-                            lexema.PositionsEntry.Add(i);
-                            lexema.CountEntry++;
-                        }
-                    }
-                    else
-                    {
-                        invertedIndex[text[i]].Add(new StatisticalInformation { FileName = fileName, CountEntry = 1, PositionsEntry = new List<int> { i } });
-                    }
-                }
-                else
-                {
-                    invertedIndex.Add(text[i],
-                        new List<StatisticalInformation>{
-                            new StatisticalInformation { FileName = fileName, CountEntry = 1, PositionsEntry = new List<int> { i } } });
-                }
-            }
-        }
+        }     
     }
 }
