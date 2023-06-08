@@ -23,10 +23,7 @@
             var lexem = Console.ReadLine();
             var numberLine = 1;
 
-            invertedIndex[lexem].Sort();
-            invertedIndex[lexem].Reverse();
-
-            foreach (var item in invertedIndex[lexem])
+            foreach (var item in invertedIndex[lexem].OrderByDescending(e => e.CountEntry))
             {
                 Console.WriteLine($"{numberLine} {item.FileName} {item.CountEntry}");
                 numberLine++;
